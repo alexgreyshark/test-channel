@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--Chart js-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <title>КАНАЛ СЕРВИС</title>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row bg-light m-3">
+          <h1 class="h1 m-5">КАНАЛСЕРВИС</h1>
+
+    </div>
+    <div class="row m-3">
+        <div class="col-lg-6">
+            <canvas id="myChart" width="400" height="300"></canvas>
+        </div>
+        <div class="col-lg-6">
+            <h3 class="text-center">
+            ВСЕГО ЗАКАЗОВ: <b>{{page_obj.paginator.count}}</b>
+            </h3>
+            <table class="table table-bordered table-sm">
+            <thead>
+                <th>
+                    №
+                </th>
+                <th>
+                    № Заказа
+                </th>
+                <th>
+                    Стоимость, $
+                </th>
+                <th>
+                    Стоимость, руб
+                </th>
+                <th>
+                    Срок поставки
+                </th>
+            </thead>
+            <tbody>
+                {% for order in page_obj %}
+            <tr>
+                <td>  {{order.id}}  </td>
+                <td>  {{order.order}}  </td>
+                <td>  {{order.dollar_cost}}  </td>
+                <td>  {{order.ruble_cost}}  </td>
+                <td>  {{order.date_finish|date:"d.m.Y"}}  </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+            <div class="pagination justify-content-center">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; Первая</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+                    {% endif %}
+                <span class="current">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+                {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+  </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const orderData = JSON.parse('{{order_json|safe}}');
+        const labels = orderData.map(function(value, index, arr) {
+                                return value.fields['date_finish'];
+                        });
+        const dollar_cost = orderData.map(function(value) {
+                                return value.fields['dollar_cost'];
+                        });
+        const data = {
+          labels: labels,
+          datasets: [{
+            label: 'Заказы',
+            data: dollar_cost,
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.0,
+          }]
+        };
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+          type: 'line',
+          data: data,
+        });
+        setInterval(() => {
+        	fetch(`/`);
+        }, 15000);
+    });
+    </script>
+  </body>
+</html>
